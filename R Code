@@ -1,0 +1,428 @@
+#data anaysis using R
+########################################
+#   This step includes all the       ###
+#   cleaning of data until getting   ###
+#   ~19000 rows                      ###
+########################################
+library(tidyverse)
+library(caret)
+
+#importing all the data and skipping through the text rows in the csv files
+df2016 <- read.csv('Desktop/Project Stats Final/2016_brooklyn.csv', skip = 4)
+df2017 <- read.csv('Desktop/Project Stats Final/2017_brooklyn.csv', skip = 4)
+df2018 <- read.csv('Desktop/Project Stats Final/2018_brooklyn.csv', skip = 4)
+df2019 <- read.csv('Desktop/Project Stats Final/2019_brooklyn.csv', skip = 4)
+df2020 <- read.csv('Desktop/Project Stats Final/2020_brooklyn.csv', skip = 6)
+
+#checking head of all dfs
+head(df2020)
+
+#changing column names to the one specified in the canvas
+colnames(df2016) <- c('borough','neighborhood','bldclasscat','taxclasscurr','block','lot','easement','bldclasscurr','address','aptnum','zip','resunits','comunits','totunits','landsqft','grosssqft','yrbuilt','taxclasssale','bldclasssale','price','date')
+colnames(df2017) <- c('borough','neighborhood','bldclasscat','taxclasscurr','block','lot','easement','bldclasscurr','address','aptnum','zip','resunits','comunits','totunits','landsqft','grosssqft','yrbuilt','taxclasssale','bldclasssale','price','date')
+colnames(df2018) <- c('borough','neighborhood','bldclasscat','taxclasscurr','block','lot','easement','bldclasscurr','address','aptnum','zip','resunits','comunits','totunits','landsqft','grosssqft','yrbuilt','taxclasssale','bldclasssale','price','date')
+colnames(df2019) <- c('borough','neighborhood','bldclasscat','taxclasscurr','block','lot','easement','bldclasscurr','address','aptnum','zip','resunits','comunits','totunits','landsqft','grosssqft','yrbuilt','taxclasssale','bldclasssale','price','date')
+colnames(df2020) <- c('borough','neighborhood','bldclasscat','taxclasscurr','block','lot','easement','bldclasscurr','address','aptnum','zip','resunits','comunits','totunits','landsqft','grosssqft','yrbuilt','taxclasssale','bldclasssale','price','date')
+
+#checking all dfs to ensure new column names
+names(df2016)
+
+#changing date column to DATE data type
+str(df2016$date)
+df2016$date <- as.Date(df2016$date, "%m/%d/%Y")
+df2017$date <- as.Date(df2017$date, "%m/%d/%y")
+df2018$date <- as.Date(df2018$date, "%m/%d/%y")
+df2019$date <- as.Date(df2019$date, "%m/%d/%y")
+df2020$date <- as.Date(df2020$date, "%m/%d/%y")
+
+df2020$date
+str(df2020$date)
+
+#changing datatype and cleaning the price column
+#for 2016
+str(df2016$price)
+df2016$price <- gsub("$", "", df2016$price)  # removing $ sign
+df2016$price <- gsub(",", "", df2016$price)  # removing ,
+df2016$price <- as.numeric(df2016$price)
+df2016$price
+
+#for 2017
+class(df2017$price)
+df2017$price <- gsub(",", "", df2017$price)  # removing ,
+df2017$price <- as.numeric(df2017$price)
+
+#for 2018
+class(df2018$price)
+df2018$price
+df2018$price <- gsub("[$]", "", df2018$price)  # removing $ sign
+df2018$price <- gsub(",", "", df2018$price)  # removing ,
+df2018$price <- as.numeric(df2018$price)
+
+#for 2019
+class(df2019$price)
+df2019$price <- gsub(",", "", df2019$price)  # removing ,
+df2019$price <- as.numeric(df2019$price)
+
+#for 2020
+class(df2020$price)
+df2020$price <- gsub(",", "", df2020$price)  # removing ,
+df2020$price <- as.numeric(df2020$price)
+
+#refining the column Gross Square Feet / grosssqft
+#2016
+class(df2016$grosssqft)
+df2016$grosssqft <- gsub(",", "", df2016$grosssqft)  # removing ,
+df2016$grosssqft <- as.numeric(df2016$grosssqft)
+
+#2017
+class(df2017$grosssqft)
+df2017$grosssqft <- gsub(",", "", df2017$grosssqft)  # removing ,
+df2017$grosssqft <- as.numeric(df2017$grosssqft)
+
+#2018
+class(df2018$grosssqft)
+df2018$grosssqft <- gsub(",", "", df2018$grosssqft)  # removing ,
+df2018$grosssqft <- as.numeric(df2018$grosssqft)
+
+#2019
+class(df2019$grosssqft)
+df2019$grosssqft <- gsub(",", "", df2019$grosssqft)  # removing ,
+df2019$grosssqft <- as.numeric(df2019$grosssqft)
+
+#2020
+class(df2020$grosssqft)
+df2020$grosssqft <- gsub(",", "", df2020$grosssqft)  # removing ,
+df2020$grosssqft <- as.numeric(df2020$grosssqft)
+
+
+#changing datatype and cleaning the landsqft
+class(df2017$landsqft)
+df2016$landsqft <- gsub(",", "", df2016$landsqft)  # removing ,
+df2016$landsqft <- as.numeric(df2016$landsqft)
+
+df2017$landsqft <- gsub(",", "", df2017$landsqft)  # removing ,
+df2017$landsqft <- as.numeric(df2017$landsqft)
+
+df2018$landsqft <- gsub(",", "", df2018$landsqft)  # removing ,
+df2018$landsqft <- as.numeric(df2018$landsqft)
+
+df2019$landsqft <- gsub(",", "", df2019$landsqft)  # removing ,
+df2019$landsqft <- as.numeric(df2019$landsqft)
+
+df2020$landsqft <- gsub(",", "", df2020$landsqft)  # removing ,
+df2020$landsqft <- as.numeric(df2020$landsqft)
+
+
+#changing datatype of year column to factor
+class(df2016$yrbuilt)
+df2016$yrbuilt <- as.factor(df2016$yrbuilt)
+df2017$yrbuilt <- as.factor(df2017$yrbuilt)
+df2018$yrbuilt <- as.factor(df2018$yrbuilt)
+df2019$yrbuilt <- as.factor(df2019$yrbuilt)
+df2020$yrbuilt <- as.factor(df2020$yrbuilt)
+
+
+#changing units to factors
+
+df2016$totunits[which(df2016$totunits == " -   ")] <- NA
+df2016$totunits <- as.numeric(df2016$totunits)
+df2017$totunits <- as.numeric(df2017$totunits)
+df2018$totunits[which(df2018$totunits == "")] <- NA
+df2018$totunits <- as.numeric(df2018$totunits)
+df2019$totunits[which(df2019$totunits == "")] <- NA
+df2019$totunits <- as.numeric(df2019$totunits)
+df2020$totunits[which(df2020$totunits == "")] <- NA
+df2020$totunits <- as.numeric(df2020$totunits)
+
+
+#changing building class at time of sale to factors
+df2016$bldclasssale <- as.factor(df2016$bldclasssale)
+df2017$bldclasssale <- as.factor(df2017$bldclasssale)
+df2018$bldclasssale <- as.factor(df2018$bldclasssale)
+df2019$bldclasssale <- as.factor(df2019$bldclasssale)
+df2020$bldclasssale <- as.factor(df2020$bldclasssale)
+
+#changing tax class at time of sale to factors
+df2016$taxclasssale <- as.factor(df2016$taxclasssale)
+df2017$taxclasssale <- as.factor(df2017$taxclasssale)
+df2018$taxclasssale <- as.factor(df2018$taxclasssale)
+df2019$taxclasssale <- as.factor(df2019$taxclasssale)
+df2020$taxclasssale <- as.factor(df2020$taxclasssale)
+
+#changing data type of commercial units to numeric 
+
+df2016$comunits[which(df2016$comunits == " -   ")] <- NA
+df2016$comunits <- as.numeric(df2016$comunits)
+df2017$comunits <- as.numeric(df2017$comunits)
+df2018$comunits[which(df2018$comunits == "")] <- NA
+df2018$comunits <- as.numeric(df2018$comunits)
+df2019$comunits[which(df2019$comunits == "")] <- NA
+df2019$comunits <- as.numeric(df2019$comunits)
+df2020$comunits[which(df2020$comunits == "")] <- NA
+df2020$comunits <- as.numeric(df2020$comunits)
+
+#changing residential units to numeric
+df2016$resunits[which(df2016$resunits == " -   ")] <- NA
+df2016$resunits <- as.numeric(df2016$resunits)
+df2017$resunits <- as.numeric(df2017$resunits)
+df2018$resunits <- gsub(",", "", df2018$resunits)  # replacing , like 1,001
+df2018$resunits[which(df2018$resunits == "")] <- NA
+df2018$resunits <- as.numeric(df2018$resunits)
+df2019$resunits[which(df2019$resunits == "")] <- NA
+df2019$resunits <- as.numeric(df2019$resunits)
+df2020$resunits[which(df2020$resunits == "")] <- NA
+df2020$resunits <- as.numeric(df2020$resunits)
+
+
+#changing buildclass at present to factors
+df2016$bldclasscurr <- as.factor(df2016$bldclasscurr)
+df2017$bldclasscurr <- as.factor(df2017$bldclasscurr)
+df2018$bldclasscurr <- as.factor(df2018$bldclasscurr)
+df2019$bldclasscurr <- as.factor(df2019$bldclasscurr)
+df2020$bldclasscurr <- as.factor(df2020$bldclasscurr)
+
+
+#changing tax class current to factors
+df2016$taxclasscurr <- as.factor(df2016$taxclasscurr)
+df2017$taxclasscurr <- as.factor(df2017$taxclasscurr)
+df2018$taxclasscurr <- as.factor(df2018$taxclasscurr)
+df2019$taxclasscurr <- as.factor(df2019$taxclasscurr)
+df2020$taxclasscurr <- as.factor(df2020$taxclasscurr)
+
+#changing building class cat to factors
+unique(df2016$bldclasscat)
+unique(df2017$bldclasscat)
+unique(df2018$bldclasscat)
+unique(df2019$bldclasscat)
+unique(df2020$bldclasscat)
+
+df2016$bldclasscat <- as.factor(df2016$bldclasscat)
+df2017$bldclasscat <- as.factor(df2017$bldclasscat)
+df2018$bldclasscat <- as.factor(df2018$bldclasscat)
+df2019$bldclasscat <- as.factor(df2019$bldclasscat)
+df2020$bldclasscat <- as.factor(df2020$bldclasscat)
+
+#changing lot to category
+df2016$lot <- as.factor(df2016$lot)
+df2017$lot <- as.factor(df2017$lot)
+df2018$lot <- as.factor(df2018$lot)
+df2019$lot <- as.factor(df2019$lot)
+df2020$lot <- as.factor(df2020$lot)
+
+#changing block to category factor
+df2016$block <- as.factor(df2016$block)
+df2017$block <- as.factor(df2017$block)
+df2018$block <- as.factor(df2018$block)
+df2019$block <- as.factor(df2019$block)
+df2020$block <- as.factor(df2020$block)
+
+
+#changing neighborhood to factors
+df2016$neighborhood <- as.factor(df2016$neighborhood)
+df2017$neighborhood <- as.factor(df2017$neighborhood)
+df2018$neighborhood <- as.factor(df2018$neighborhood)
+df2019$neighborhood <- as.factor(df2019$neighborhood)
+df2020$neighborhood <- as.factor(df2020$neighborhood)
+
+
+#working on all NA
+#taxclasscurr
+sum(is.na(df2019$borough))
+df2016$taxclasscurr[which(df2016$taxclasscurr == "  ")] <- NA
+df2017$taxclasscurr[which(df2017$taxclasscurr == " ")] <- NA
+df2018$taxclasscurr[which(df2018$taxclasscurr == "")] <- NA
+df2019$taxclasscurr[which(df2019$taxclasscurr == "")] <- NA
+df2020$taxclasscurr[which(df2020$taxclasscurr == "")] <- NA
+df2020 <- df2020[-1,] #removing first blank line in 2020
+
+#building class at present
+df2016$bldclasscurr[which(df2016$bldclasscurr == "  ")] <- NA
+df2017$bldclasscurr[which(df2017$bldclasscurr == " ")] <- NA
+df2018$bldclasscurr[which(df2018$bldclasscurr == "")] <- NA
+df2019$bldclasscurr[which(df2019$bldclasscurr == "")] <- NA
+df2020$bldclasscurr[which(df2020$bldclasscurr == "")] <- NA
+
+df2020$zip[which(df2020$zip == "")] <- NA
+df2018$zip[which(df2018$zip == "")] <- NA
+df2018$zip[which(df2018$zip == "")] <- NA
+df2018$zip[which(df2018$zip == "")] <- NA
+
+#drop easement
+df2016 <- df2016[,-7]
+df2017 <- df2017[,-7]
+df2018 <- df2018[,-7]
+df2019 <- df2019[,-7]
+df2020 <- df2020[,-7]
+
+#joining all individual dfs
+mydf <- rbind(df2016,df2017,df2018,df2019,df2020)
+dim(mydf)
+
+#drop all other categories where the bldclasssale is other than A or R
+mydf1 <- mydf[grepl("A", mydf$bldclasssale),]
+mydf2 <- mydf[grepl("R", mydf$bldclasssale),]
+
+mydf <- rbind(mydf1,mydf2)
+
+#where totunits and resiunits are both 1
+mydf <- mydf[mydf$totunits == '1' & mydf$resunits == '1', ]
+
+#where grosssqft is > 0 
+mydf <- mydf[mydf$grosssqft > 0, ]
+
+#where sale price is not missing
+
+mydf <- mydf[!is.na(mydf$price),]
+dim(mydf)
+
+unique(mydf$bldclasscat)
+
+#handling for spaces in 01 one family dwelling factor in bldclasscat
+mydf$bldclasscat[which(mydf$bldclasscat == "01  ONE FAMILY DWELLINGS                    
+")] <- "01 ONE FAMILY DWELLINGS"
+
+######################################################################
+######################################################################
+#Until this point, I have cleaned all the data and got 19640 rows
+dim(mydf)
+######################################################################
+######################################################################
+
+
+
+######################################################################
+# FROM HERE I AM LOADING MY DATAFRAME as DF and start modelling for Part 1
+write_csv(mydf, "Desktop/Project Stats Final/mydf.csv")
+df <- read.csv("Desktop/Project Stats Final/mydf.csv")
+head(df)
+######################################################################
+
+#defining correct data types
+unique(df$taxclasssale)
+df$neighborhood <- as.factor(df$neighborhood)
+df$bldclasscat <- as.factor(df$bldclasscat)
+df$taxclasscurr <- as.factor(df$taxclasscurr)
+df$bldclasscurr <- as.factor(df$bldclasscurr)
+df$bldclasssale <- as.factor(df$bldclasssale)
+df$block <- as.factor(df$block)
+df$lot <- as.factor(df$lot)
+df$zip <- as.factor(df$zip)
+df$taxclasssale <- as.factor(df$taxclasssale)
+df$landsqft <- as.numeric(df$landsqft)
+df$grosssqft <- as.numeric(df$grosssqft)
+df$price <- as.numeric(df$price)
+df$date <- as.Date(df$date)
+df$yrbuilt <- as.numeric(df$yrbuilt)
+
+#cleaning factors in bldclasscat
+unique(df$bldclasscat)
+df$bldclasscat[which(df$bldclasscat == "01 ONE FAMILY DWELLINGS                    ")] <- "01 ONE FAMILY DWELLINGS"
+df$bldclasscat[which(df$bldclasscat == "01  ONE FAMILY DWELLINGS                    ")] <- "01 ONE FAMILY DWELLINGS"
+
+unique(df$bldclasssale)
+
+#Data Filtering
+hist(df$price, breaks = 1000)
+df <- df %>% 
+  filter(price != 0) # removing all non 0 prices
+
+df <- df[df$price >= 10000, ] # removing prices which are below $10000
+
+#identifying bldclasssale high price categories to control for outliers
+df$bldclasssale <- gsub(" ", "", df$bldclasssale)  # removing bad spaces
+df$bldclasssale <- as.factor(df$bldclasssale)
+
+#its clear that A7 has higher average due to mansions in that category
+#creating cateory column, 1 and 0 -> 1 means mansion and 0 means not mansion
+df$IsMansion <- "Not Mansion"
+df$IsMansion[which(df$bldclasssale == "A7")] <- "Mansion"
+df$IsMansion <- as.factor(df$IsMansion)
+plot(df$IsMansion, df$price)
+
+#removing unnecessary columns
+df <- df %>% 
+  select(-borough, -address, -aptnum, -resunits, -totunits, -comunits)
+
+#making 3 quarters from dates
+df$quarter <- "ALLQuarters"
+#2020
+df$quarter[which(df$date >= "2020-07-01" & df$date <= "2020-09-30")] <- "Quarter3-2020"
+df$quarter[which(df$date >= "2020-10-01" & df$date <= "2020-12-31")] <- "Quarter4-2020"
+df$quarter[which(df$date >= "2020-07-01" & df$date <= "2020-09-30")] <- "Quarter3-2020"
+df$quarter[which(df$date >= "2020-10-01" & df$date <= "2020-12-31")] <- "Quarter4-2020"
+df$quarter <- as.factor(df$quarter)
+plot(df$quarter, df$price)
+
+#making clusters of Zip code based on similar means - reduced levels to 18
+plot(df$zip, df$price)
+mean_by_zip <- df %>% 
+  group_by(zip) %>% 
+  summarise(mean_price = mean(price))
+#plotting sorted means and then identifying which zips can be joined together
+#to reduce DF and get their interaction term 
+plot(mean_by_zip$zip, sort(mean_by_zip$mean_price), type = "l")
+#joining zips together with similar means
+#11236 -> 11207
+df$zip[which(df$zip == 11236)] <- 11207
+#11239 >- 11203
+df$zip[which(df$zip == 11239)] <- 11203
+#11235/11221/ -> 11219
+df$zip[which(df$zip == 11235)] <- 11219
+df$zip[which(df$zip == 11221)] <- 11219
+#11220 <- 11213
+df$zip[which(df$zip == 11220)] <- 11213
+#11222 <- 11249
+df$zip[which(df$zip == 11222)] <- 11249
+#11231/11217/11238/11215 <- #11201
+df$zip[which(df$zip == 11231)] <- 11201
+df$zip[which(df$zip == 11217)] <- 11201
+df$zip[which(df$zip == 11215)] <- 11201
+df$zip[which(df$zip == 11238)] <- 11201
+#11216/11226 > 11232
+df$zip[which(df$zip == 11216)] <- 11232
+df$zip[which(df$zip == 11226)] <- 11232
+#11209/11223 > 11205
+df$zip[which(df$zip == 11209)] <- 11205
+df$zip[which(df$zip == 11223)] <- 11205
+#11233 > 11229
+df$zip[which(df$zip == 11233)] <- 11229
+#213>210
+df$zip[which(df$zip == 11213)] <- 11210
+#204 > 228
+df$zip[which(df$zip == 11204)] <- 11228
+#230 211 > 218
+df$zip[which(df$zip == 11230)] <- 11218
+df$zip[which(df$zip == 11211)] <- 11218
+#280 > 212
+df$zip[which(df$zip == 11208)] <- 11212
+
+#record zip again to see the new plot
+mean_by_zip <- df %>% 
+  group_by(zip) %>% 
+  summarise(mean_price = mean(price))
+plot(mean_by_zip$zip, sort(mean_by_zip$mean_price), type = "l")
+sort(unique(df$zip))
+
+
+#################### Yrbuilt ##########
+df$YearBuiltKnown <- "Known"
+df$YearBuiltKnown[which(df$yrbuilt == 0)] <- "Not Known"
+df$YearBuiltKnown <- as.factor(df$YearBuiltKnown)
+plot(df$YearBuiltKnown, df$price)
+######################################
+
+############Transformation attemps#########
+hist(df$price)
+hist(sqrt(df$price))
+hist(df$landsqft)
+hist(sqrt(df$landsqft))
+
+hist(df$grosssqft)
+hist(df$yrbuilt)
+#-----------------------------#
+######### regression start ##########
+model <- lm(pricesqrt ~ grosssqft + sqrt(landsqft) + neighborhood + IsMansion  + YearBuiltKnown + taxclasssale + quarter , df)
+summary(model)
+######### regression end ##########
+#---------------------------- #
+
